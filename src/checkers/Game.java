@@ -23,7 +23,7 @@ public class Game {
 
     public Game(Player player1, Player player2) {
         this.board = new Board();
-        this.isBlackTurn = false;
+        this.isWhiteTurn = false;
 
     }
 
