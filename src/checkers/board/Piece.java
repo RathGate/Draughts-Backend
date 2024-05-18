@@ -1,9 +1,10 @@
-package checkers;
+package checkers.board;
 public class Piece {
     public enum PieceType {
         Man,
         King
     }
+
     public Color color;
     public PieceType pieceType;
 
@@ -32,4 +33,5 @@ public class Piece {
 
         return str;
     }
+
 }

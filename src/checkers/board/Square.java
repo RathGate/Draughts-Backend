@@ -1,4 +1,4 @@
-package checkers;
+package checkers.board;
 
 public class Square {
     public Piece piece;
@@ -13,5 +13,12 @@ public class Square {
     @Override
     public String toString() {
         return piece != null ? piece.toString() : "  ";
+    }
+
+    public String toState() {
+        if (piece != null) {
+            return piece.toString();
+        }
+        return "--";
     }
 }

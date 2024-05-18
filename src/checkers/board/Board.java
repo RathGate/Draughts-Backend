@@ -1,14 +1,20 @@
-package checkers;
+package checkers.board;
+
+import checkers.logic.Move;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Board {
     public Square[] squares = new Square[32];
 
     public Board() {
-        EmptyBoard();
+        emptyBoard();
 
         for (int i = 0; i < 8; i++) {
             squares[i].piece = new Piece(Color.Black);
@@ -16,12 +22,15 @@ public class Board {
         }
     }
 
-    public void EmptyBoard() {
+    // ----- BOARD : MODIFICATION ----- //
+    public void emptyBoard() {
         for (int i = 0; i < squares.length; i++) {
             squares[i] = new Square();
         }
     }
+    // -------------------------------- //
 
+    // ----- TEMP : DEBUG FUNCTIONS ----- //
     public void print(boolean numbers) {
         boolean isInverted = true;
         String curr = "";
@@ -43,7 +52,9 @@ public class Board {
         }
         System.out.print("\n+----+----+----+----+----+----+----+----+\n");
     }
+    // ---------------------------------- //
 
+    // ----- SQUARES : RETRIEVE PIECES ----- //
     public Piece getPieceAt(int index) {
         if (!isValidIndex(index)) {
             return null;
@@ -54,6 +65,9 @@ public class Board {
         int index = toIndex(point);
         return getPieceAt(index);
     }
+    // ------------------------------------- //
+
+    // ----- SQUARES : INDEX AND POINT CHECKING/CONVERSION ----- //
     public static boolean isValidIndex(int index) { return (index >= 0 && index < 32); }
     public static boolean isValidPoint(int x, int y) { return isValidPoint(new Point(x, y)) ;}
     public static boolean isValidPoint(Point point) {
@@ -68,7 +82,6 @@ public class Board {
 
         return !(point.x % 2 == point.y % 2);
     }
-
     public static Point toPoint(int index) {
         if (!isValidIndex(index)) {
             return new Point(-1, -1);
@@ -77,7 +90,6 @@ public class Board {
         int x = 2 * (index % 4) + (y + 1) % 2;
         return new Point(x, y);
     }
-
     public static int toIndex(Point point) {
         return toIndex(point.x, point.y);
     }
@@ -87,11 +99,12 @@ public class Board {
         }
         return y * 4 + x / 2;
     }
+    // --------------------------------------------------------- //
 
+    // ----- SQUARES : RETRIEVE SQUARE BETWEEN TWO SQUARES ----- //
     public static int getMiddleIndex(int i1, int i2) {
         return toIndex(getMiddlePoint(toPoint(i1), toPoint(i2)));
     }
-
     public static Point getMiddlePoint(Point p1, Point p2) {
         if (p1 == null || p2 == null) {
             return new Point(-1, -1);
@@ -110,6 +123,9 @@ public class Board {
 
         return new Point(x1 + dx / 2, y1+dy / 2);
     }
+    // ------------------------------------------------ //
+
+    // SQUARES : RETRIEVES ALL FOUR POINTS AROUND SQUARE ----- //
     public static List<Point> getPointsAround(Point origin, Piece piece, int distance) {
         List<Point> points = new ArrayList<Point>();
 
@@ -133,7 +149,6 @@ public class Board {
         }
         return finalPoints;
     }
-
     public List<Point> getPointsAround(int index, int distance) {
         List<Point> points = new ArrayList<>();
         if (!isValidIndex(index)) {
@@ -145,10 +160,124 @@ public class Board {
         }
         return Board.getPointsAround(toPoint(index), piece, distance);
     }
+    // ------------------------------------------------------ //
 
+    // ----- PIECES : RETRIEVES ALL PIECES POSITIONS ----- //
+    public List<Integer> findPiecesIndex(Color color) {
+        List<Integer> indexes = new ArrayList<>();
+
+        for (int i = 0; i < 32 ; i++) {
+            Piece piece = getPieceAt(i);
+            if (piece != null && piece.color == color) {
+                indexes.add(i);
+            }
+        }
+        return indexes;
+    }
+    public List<Point> findPieces(Color color) {
+        List<Point> points = new ArrayList<>();
+
+        for (int i = 0; i < 32; i++) {
+            Piece piece = getPieceAt(i);
+            if (piece != null && piece.color == color) {
+                points.add(toPoint(i));
+            }
+        }
+        return points;
+    }
+    public List<Point> findPieces(Piece.PieceType pieceType) {
+        List<Point> points = new ArrayList<>();
+
+        for (int i = 0; i < 32; i++) {
+            Piece piece = getPieceAt(i);
+            if (piece != null && piece.pieceType == pieceType) {
+                points.add(toPoint(i));
+            }
+        }
+        return points;
+    }
+    public List<Point> findPieces(Color color, Piece.PieceType pieceType) {
+        List<Point> points = new ArrayList<>();
+
+        for (int i = 0; i < 32; i++) {
+            Piece piece = getPieceAt(i);
+            if (piece != null && piece.color == color && piece.pieceType == pieceType) {
+                points.add(toPoint(i));
+            }
+        }
+        return points;
+    }
+    // -------------------------------------------------- //
+
+    // ----- PIECES : RETRIEVE MOVES AND SKIPS ----- //
+    public List<Point> getPossibleMoves(Point origin) {
+        return getPossibleMoves(Board.toIndex(origin));
+    }
+    public List<Point> getPossibleMoves(int index) {
+        List<Point> points = new ArrayList<>();
+        if (!Board.isValidIndex(index)) {
+            return points;
+        }
+        Piece piece = squares[index].piece;
+        if (piece == null) {
+            return points;
+        }
+        Point origin = toPoint(index);
+
+        points = getPointsAround(origin, piece, 1);
+
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+            if (getPieceAt(point) != null) {
+                points.remove(i--);
+            }
+        }
+        return points;
+    }
+    public List<Point> getPossibleSkips(Point origin) {
+        return getPossibleSkips(Board.toIndex(origin));
+    }
+    public List<Point> getPossibleSkips(int index) {
+        List<Point> points = new ArrayList<>();
+        if (!Board.isValidIndex(index)) {
+            return points;
+        }
+        Piece piece = squares[index].piece;
+        if (piece == null) {
+            return points;
+        }
+        Point origin = toPoint(index);
+
+        points = getPointsAround(origin, piece, 2);
+
+        for (int i = 0; i < points.size(); i++) {
+            Point point = points.get(i);
+            if (!isValidSkip(index, toIndex(point))) {
+                points.remove(i--);
+            }
+        }
+        return points;
+    }
+    public boolean isValidSkip(int startIndex, int endIndex) {
+        if (getPieceAt(endIndex) != null) {
+            return false;
+        }
+        Piece startPiece = getPieceAt(startIndex);
+        int middleIndex = getMiddleIndex(startIndex, endIndex);
+        Piece middlePiece = getPieceAt(middleIndex);
+
+        if (middlePiece == null) {
+            return false;
+        }
+        return startPiece.color != middlePiece.color;
+        // ------------------------------------------------------ //
+
+    }
+
+    // ----- PLAYER : RETRIEVE ALL POSSIBLE LEGAL MOVES ----- //
     public List<Move> getLegalMoves(Color color) {
         List<Move> legalMoves = new ArrayList<>();
-        List<Point> checkers = findCheckerPositions(color);
+        List<Point> checkers = findPieces(color);
 
         if (checkers.size() == 0) {
             return legalMoves;
@@ -175,112 +304,62 @@ public class Board {
         return legalMoves;
     }
 
-    public List<Point> getPossibleMoves(Point origin) {
-        return getPossibleMoves(Board.toIndex(origin));
-    }
-    public List<Point> getPossibleMoves(int index) {
-        List<Point> points = new ArrayList<>();
-        if (!Board.isValidIndex(index)) {
-            return points;
-        }
-        Piece piece = squares[index].piece;
-        if (piece == null) {
-            return points;
-        }
-        Point origin = toPoint(index);
-
-        points = getPointsAround(origin, piece, 1);
-
-        for (int i = 0; i < points.size(); i++) {
-            Point point = points.get(i);
-            if (getPieceAt(point) != null) {
-                points.remove(i--);
-            }
-        }
-        return points;
-    }
-
-    public List<Point> getPossibleSkips(Point origin) {
-        return getPossibleSkips(Board.toIndex(origin));
-    }
-
-    public List<Point> getPossibleSkips(int index) {
-        List<Point> points = new ArrayList<>();
-        if (!Board.isValidIndex(index)) {
-            return points;
-        }
-        Piece piece = squares[index].piece;
-        if (piece == null) {
-            return points;
-        }
-        Point origin = toPoint(index);
-
-        points = getPointsAround(origin, piece, 2);
-
-        for (int i = 0; i < points.size(); i++) {
-            Point point = points.get(i);
-            if (!isValidSkip(index, toIndex(point))) {
-                points.remove(i--);
-            }
-        }
-        return points;
-    }
-
-    public List<Point> findCheckerPositions() {
-        List<Point> points = new ArrayList<>();
-
-        for (int i = 0; i < 32; i++) {
-            if (getPieceAt(i) != null) {
-                points.add(toPoint(i));
-            }
-        }
-        return points;
-    }
-    public List<Point> findCheckerPositions(Color color) {
-        List<Point> points = new ArrayList<>();
-
+    public String toState() {
+        StringBuilder state = new StringBuilder();
+        List<String> whites = new ArrayList<>();
+        List<String> blacks = new ArrayList<>();
         for (int i = 0; i < 32; i++) {
             Piece piece = getPieceAt(i);
-            if (piece != null && piece.color == color) {
-                points.add(toPoint(i));
-            }
-        }
-        return points;
-    }
-    public List<Point> findCheckerPositions(Piece.PieceType pieceType) {
-        List<Point> points = new ArrayList<>();
+            if (piece == null) { continue; }
 
-        for (int i = 0; i < 32; i++) {
-            Piece piece = getPieceAt(i);
-            if (piece != null && piece.pieceType == pieceType) {
-                points.add(toPoint(i));
+            String temp = piece.pieceType == Piece.PieceType.King ? "K" : "";
+            if (piece.color == Color.White) {
+                whites.add(temp + (i+1));
+                continue;
             }
+            blacks.add(temp+(i+1));
         }
-        return points;
-    }
-    public List<Point> findCheckerPositions(Color color, Piece.PieceType pieceType) {
-        List<Point> points = new ArrayList<>();
 
-        for (int i = 0; i < 32; i++) {
-            Piece piece = getPieceAt(i);
-            if (piece != null && piece.color == color && piece.pieceType == pieceType) {
-                points.add(toPoint(i));
-            }
+        if (whites.size() != 0) { state.append("W").append(String.join(",",whites)); }
+        if (blacks.size() != 0) {
+            if (whites.size() != 0) { state.append(":"); }
+            state.append("B").append(String.join(",",blacks));
         }
-        return points;
+        return state.toString();
     }
 
-    public boolean isValidSkip(int startIndex, int endIndex) {
-        if (getPieceAt(endIndex) != null) {
-            return false;
-        }
-        Piece startPiece = getPieceAt(startIndex);
-        int middleIndex = getMiddleIndex(startIndex, endIndex);
-        Piece middlePiece = getPieceAt(middleIndex);
+    public static boolean IsValidBoardState(String state) {
+        String re = "^(?:W(?<whites>(K?(?:3[0-2]|[12][0-9]|[0-9]))(?:,K?(?:3[0-2]|[12][0-9]|[0-9]))*)(?::?(?=B))*)?(?:B(?<blacks>(K?(?:3[0-2]|[12][0-9]|[0-9]))(?:,K?(?:3[0-2]|[12][0-9]|[0-9]))*))?$";
+        return state.length() != 0 && state.matches(re);
+    }
 
-        if (middlePiece == null) {
-            return false;
+
+    public static Board toBoard(String state) {
+        if (!IsValidBoardState(state)) {
+            return null;
         }
-        return startPiece.color != middlePiece.color;
+        Board board = new Board();
+        board.emptyBoard();
+
+        String re = "^(?:W(?<White>(K?(?:3[0-2]|[12][0-9]|[0-9]))(?:,K?(?:3[0-2]|[12][0-9]|[0-9]))*)(?::?(?=B))*)?(?:B(?<Black>(K?(?:3[0-2]|[12][0-9]|[0-9]))(?:,K?(?:3[0-2]|[12][0-9]|[0-9]))*))?$";
+        Pattern pattern = Pattern.compile(re);
+        Matcher matcher = pattern.matcher(state);
+        boolean success = matcher.find();
+
+        for (Color color : Color.values()) {
+            try {
+                String[] moves = success ? matcher.group(color.toString()).split(",") : null;
+                if (moves == null || moves.length == 0) {
+                    continue;
+                }
+
+                for (String move : moves) {
+                    int index = Integer.parseInt(move.replaceAll("[\\D]", "")) - 1;
+                    Piece.PieceType pieceType = move.charAt(0) == 'K' ? Piece.PieceType.King : Piece.PieceType.Man;
+                    board.squares[index].piece = new Piece(color, pieceType);
+                }
+            } catch (java.lang.IllegalArgumentException ignored) {}
+        }
+        return board;
     }
 }

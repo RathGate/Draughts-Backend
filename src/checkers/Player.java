@@ -1,6 +1,6 @@
 package checkers;
 
-import java.security.InvalidParameterException;
+import checkers.board.Color;
 
 public class Player {
     private Color color;

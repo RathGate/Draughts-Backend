@@ -1,9 +1,9 @@
-import checkers.Board;
-import checkers.Color;
-import checkers.Piece;
+import checkers.board.Board;
+import checkers.board.Color;
+import checkers.board.Piece;
 
-import java.awt.*;
-import java.util.List;
+import static checkers.board.Board.IsValidBoardState;
+import static checkers.board.Board.toBoard;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,7 +15,10 @@ public class Main {
         board.squares[5].piece = null;
         board.squares[25].piece = new Piece(Color.White, Piece.PieceType.King);
         board.print(false);
-        System.out.println("Possible moves for white : " +board.getLegalMoves(Color.White));
-        System.out.println("Possible moves for black : " +board.getLegalMoves(Color.Black));
+        String state = (board.toState());
+        System.out.println(state);
+        board = toBoard(state);
+        assert board != null;
+        board.print(false);
     }
 }

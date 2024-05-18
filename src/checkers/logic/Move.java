@@ -1,4 +1,4 @@
-package checkers;
+package checkers.logic;
 
 import java.awt.*;
 import java.util.ArrayList;
