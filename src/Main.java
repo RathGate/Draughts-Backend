@@ -1,24 +1,28 @@
 import checkers.board.Board;
 import checkers.board.Color;
 import checkers.board.Piece;
+import checkers.logic.Game;
+import checkers.logic.Move;
+import checkers.logic.Rules;
 
-import static checkers.board.Board.IsValidBoardState;
 import static checkers.board.Board.toBoard;
 
 public class Main {
     public static void main(String[] args) {
-        Board board = new Board();
-        board.squares[22].piece = new Piece(Color.Black, Piece.PieceType.Man);
-        board.squares[21].piece = new Piece(Color.Black, Piece.PieceType.Man);
+        String state = "W5,26,27,28,29,30,31,17,32:B2,3,16,6,7,8,24";
+        Game game = new Game();
+        game.setBoard(toBoard(state));
 
-        board.squares[26].piece = null;
-        board.squares[5].piece = null;
-        board.squares[25].piece = new Piece(Color.White, Piece.PieceType.King);
-        board.print(false);
-        String state = (board.toState());
-        System.out.println(state);
-        board = toBoard(state);
-        assert board != null;
-        board.print(false);
+        game.print();
+        game.makeMove(26, 19);
+        game.print();
+        game.makeMove(19,10);
+        game.print();
+        game.makeMove(10,3);
+        game.print();
+        game.makeMove(6,9);
+        game.print();
+        game.makeMove(27,23);
+        game.print();
     }
 }

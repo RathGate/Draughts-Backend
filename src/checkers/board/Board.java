@@ -258,6 +258,16 @@ public class Board {
         }
         return points;
     }
+
+    public List<Point> getPossibleSkips(Color color) {
+        List<Point> checkers = findPieces(color);
+        List<Point> skips = new ArrayList<>();
+
+        for (Point checker : checkers) {
+            skips.addAll(getPossibleSkips(checker));
+        }
+        return skips;
+    }
     public boolean isValidSkip(int startIndex, int endIndex) {
         if (getPieceAt(endIndex) != null) {
             return false;
@@ -287,7 +297,7 @@ public class Board {
             List<Point> skips = getPossibleSkips(checker);
             int index = toIndex(checker);
             for (Point skip : skips) {
-                Move m = new Move(index, toIndex(skip), Move.MoveType.Skip);
+                Move m = new Move(index, toIndex(skip), true);
                 legalMoves.add(m);
             }
         }
@@ -361,5 +371,31 @@ public class Board {
             } catch (java.lang.IllegalArgumentException ignored) {}
         }
         return board;
+    }
+    public boolean setPiece(int index, Piece piece) {
+        if (!isValidIndex(index)) {
+            return false;
+        }
+        squares[index].piece = piece;
+        return true;
+    }
+    public boolean setPiece(int index, Color color, Piece.PieceType pieceType) {
+        return setPiece(index, new Piece(color, pieceType));
+    }
+
+    public boolean checkKingPromotion(int index, Piece piece) {
+        if (piece == null || piece.pieceType == Piece.PieceType.King) {
+            return false;
+        }
+        Point endPoint = toPoint(index);
+        return piece.pieceType == Piece.PieceType.Man && ((endPoint.y == 0 && piece.color == Color.White) ||
+                (endPoint.y == 7 && piece.color == Color.Black));
+    }
+
+    public Board copy() {
+        Board copy = new Board();
+        copy.emptyBoard();
+        copy.squares = squares.clone();
+        return copy;
     }
 }
