@@ -110,7 +110,7 @@ public class Game {
         }
 
         if (lastSkipInTurn != null) {
-            lastSkipInTurn.addStep(endIndex);
+            lastSkipInTurn.addStepAfter(endIndex);
             return;
         }
 

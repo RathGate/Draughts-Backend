@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Board {
     public Square[] squares = new Square[32];
@@ -395,7 +396,78 @@ public class Board {
     public Board copy() {
         Board copy = new Board();
         copy.emptyBoard();
-        copy.squares = squares.clone();
+
+        for (int i = 0; i < 32; i++) {
+            copy.squares[i] = new Square(squares[i]);
+        }
         return copy;
     }
+
+    public void movePiece(int startIndex, int endIndex) {
+        Piece movingPiece = getPieceAt(startIndex);
+        int midIndex = Board.getMiddleIndex(startIndex, endIndex);
+        setPiece(endIndex, movingPiece);
+        setPiece(midIndex, null);
+        setPiece(startIndex, null);
+        boolean isSkip = midIndex > 0;
+
+        // Crown king
+        if (checkKingPromotion(endIndex, movingPiece)) {
+            setPiece(endIndex, movingPiece.color, Piece.PieceType.King);
+        }
+    }
+
+    public List<Move> getCompleteSkips(int startIndex, int endIndex) {
+        if (!isValidIndex(endIndex)) {
+            return getCompleteSkips(startIndex);
+        }
+        return getCompleteSkips(startIndex).stream()
+                .filter(m -> m.endIndex == endIndex)
+                .collect(Collectors.toList());
+    }
+
+    public List<Move> getCompleteSkips(int startIndex) {
+        Board saved_board = this.copy();
+        List<Move> result_skips = new ArrayList<>();
+
+        List<Point> skips_from_index = getPossibleSkips(startIndex);
+//        if (debug) { printTemp(startIndex, skips_from_index, level); }
+
+        for (Point skip : skips_from_index) {
+            Board temp_board = saved_board.copy();
+            int end_index = toIndex(skip);
+            temp_board.movePiece(startIndex, end_index);
+            Move temp = new Move(startIndex, end_index,true);
+            List <Move> movesFromIndex = temp_board.getCompleteSkips(end_index);
+            if (movesFromIndex.isEmpty()) {
+                    result_skips.add(temp);
+            } else {
+                for (Move move : movesFromIndex) {
+                    move.addStepBefore(startIndex);
+                    result_skips.add(move);
+                }
+            }
+        }
+        return result_skips;
+    }
+
+    public List<Integer> pointsToIndexes(List<Point> points) {
+        List<Integer> indexes = new ArrayList<>();
+        if (points != null) {
+            for (Point point : points) {
+                indexes.add(toIndex(point));
+            }
+        }
+        return indexes;
+    }
+
+    public void printTemp(int startIndex, List<Point> points, int indent) {
+        String baseStr = " ".repeat(indent*3);
+        baseStr += indent+". From position "+startIndex+" : ";
+
+        baseStr+=pointsToIndexes(points);
+        System.out.println(baseStr);
+
+    }
 }
+

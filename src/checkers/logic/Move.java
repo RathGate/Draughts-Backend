@@ -2,44 +2,42 @@ package checkers.logic;
 
 import checkers.board.Board;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Move {
     public boolean isSkip = false;
-    public boolean isAmbiguous = true;
     public int startIndex;
     public int endIndex;
     public List<Integer> skipSteps = new ArrayList<>();
 
     public Move(int startIndex, int endIndex) {
-        this.startIndex = startIndex;
-        this.endIndex = endIndex;
+        this(startIndex, endIndex, false, null);
     }
 
     public Move(int startIndex, int endIndex, boolean isSkip) {
-        this.startIndex = startIndex;
-        this.endIndex = endIndex;
-        this.isSkip = isSkip;
+        this(startIndex, endIndex, isSkip, null);
     }
-    public Move(int startIndex, int endIndex, boolean isSkip, boolean isAmbiguous) {
+    public Move(int startIndex, int endIndex, boolean isSkip, List<Integer> intSteps) {
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.isSkip = isSkip;
-        if (this.isSkip) { this.isAmbiguous = isAmbiguous; }
+        this.skipSteps = intSteps == null ? new ArrayList<>() : intSteps;
     }
 
-    public void addStep(int newEndIndex) {
+    public void addStepAfter(int newEndIndex) {
         if (!Board.isValidIndex(newEndIndex) || !this.isSkip) {
             return;
         }
         skipSteps.add(this.endIndex);
         this.endIndex = newEndIndex;
     }
-    public void addStep(int newEndIndex, boolean isAmbiguous) {
-        addStep(newEndIndex);
-        this.isAmbiguous = isAmbiguous;
+    public void addStepBefore(int newStartIndex) {
+        if (!Board.isValidIndex(newStartIndex) || !this.isSkip) {
+            return;
+        }
+        skipSteps.add(0,this.startIndex);
+        this.startIndex = newStartIndex;
     }
 
     @Override
@@ -51,12 +49,18 @@ public class Move {
             return result.toString();
         }
         result.append("x");
-        if (isAmbiguous) {
-            for (int skipStep : skipSteps) {
-                result.append(skipStep).append("x");
-            }
+        for (int skipStep : skipSteps) {
+            result.append(skipStep).append("x");
         }
         result.append(endIndex);
         return result.toString();
+    }
+
+    public Move copy() {
+        return new Move(this.startIndex, this.endIndex, this.isSkip, this.skipSteps);
+    }
+
+    public void testPrint() {
+        System.out.println("Start: "+this.startIndex + " | End: "+this.endIndex+" | Middle: "+skipSteps);
     }
 }

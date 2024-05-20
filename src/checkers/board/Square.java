@@ -21,4 +21,8 @@ public class Square {
         }
         return "--";
     }
+
+    public Square(Square square) {
+        this.piece = square.piece == null ? null : new Piece(square.piece.color, square.piece.pieceType);
+    }
 }
