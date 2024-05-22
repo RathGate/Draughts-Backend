@@ -5,7 +5,7 @@ import org.java_websocket.WebSocket;
 public class CheckersGame {
     private WebSocket player1;
     private WebSocket player2;
-    private int[][] board; // Simplified board representation
+    private int[][] board;
 
     public CheckersGame(WebSocket player1, WebSocket player2) {
         this.player1 = player1;
@@ -14,8 +14,7 @@ public class CheckersGame {
     }
 
     private void initializeBoard() {
-        board = new int[8][8]; // Simplified 8x8 checkers board
-        // Initialize board with pieces
+        board = new int[8][8];
     }
 
     public void handleMove(WebSocket player, String move) {
@@ -28,7 +27,7 @@ public class CheckersGame {
     }
 
     public boolean isGameOver() {
-        // Check for game over conditions
+        // game over conditions
         return false;
     }
 
