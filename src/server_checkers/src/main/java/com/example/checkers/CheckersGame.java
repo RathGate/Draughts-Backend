@@ -1,24 +1,26 @@
 package com.example.checkers;
 
 import org.java_websocket.WebSocket;
+import org.json.JSONObject;
 
 public class CheckersGame {
     private WebSocket player1;
     private WebSocket player2;
-
 
     public CheckersGame(WebSocket player1, WebSocket player2) {
         this.player1 = player1;
         this.player2 = player2;
     }
 
-
     public void handleMove(WebSocket player, String move) {
-        // Parse and validate the move, update the board, and notify players
+        JSONObject moveJson = new JSONObject();
+        moveJson.put("type", "move");
+        moveJson.put("move", move);
         if (player == player1) {
-            player2.send("Opponent's move: " + move);
+            player2.send(moveJson.toString());
+
         } else {
-            player1.send("Opponent's move: " + move);
+            player1.send(moveJson.toString());
         }
     }
 
