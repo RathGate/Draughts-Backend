@@ -16,22 +16,22 @@ import java.util.regex.Pattern;
 import static checkers.board.Board.toBoard;
 
 public class Main {
-    public static void main(String[] args) {
-        String state = "W18,14,19,21,23,24,K26,29,30,31,32:B1,2,3,4,6,7,9,10,11,12";
-
-        Game game = new Game();
-
-        game.setBoard(toBoard(state));
-
-        game.print();
-        List<Move> moves = game.getBoard().getCompleteSkips(4);
-        System.out.println(moves.size());
-        for (Move move : moves) {
-            System.out.println(move);
-        }
-        game.getBoard().print(true);
-        System.out.println(game.getBoard().getLegalMoves(Color.Black));
-        System.out.println(game.getBoard().toState());
+//    public static void main(String[] args) {
+//        String state = "W18,14,19,21,23,24,K26,29,30,31,32:B1,2,3,4,6,7,9,10,11,12";
+//
+//        Game game = new Game();
+//
+//        game.setBoard(toBoard(state));
+//
+//        game.print();
+//        List<Move> moves = game.getBoard().getCompleteSkips(4);
+//        System.out.println(moves.size());
+//        for (Move move : moves) {
+//            System.out.println(move);
+//        }
+//        game.getBoard().print(true);
+//        System.out.println(game.getBoard().getLegalMoves(Color.Black));
+//        System.out.println(game.getBoard().toState());
 
 //        String str = """
 //                1. 11-15 23-18 2. 8-11 26-23 {Crescent Cross} 3. 10-14 30-26 4. 6-10 24-19 5.
@@ -65,6 +65,13 @@ public class Main {
 //        }
 //
 //        System.out.println("Résultat: "+result);
-    }
+//    }
+//
+//}
 
+public class Main {
+    public static void main(String[] args) {
+        game_server.CheckersServer.main(args);
+    }
 }
+
