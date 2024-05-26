@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CheckersServer extends WebSocketServer {
 
-    private static final int PORT = 3000;
+    private static final int PORT = 6969;
     private Queue<WebSocket> playerQueue = new ConcurrentLinkedQueue<>();
     private Map<WebSocket, CheckersGame> games = new HashMap<>();
 
