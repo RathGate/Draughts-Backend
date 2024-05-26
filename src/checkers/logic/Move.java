@@ -22,7 +22,9 @@ public class Move {
         this.startIndex = startIndex;
         this.endIndex = endIndex;
         this.isSkip = isSkip;
-        this.skipSteps = intSteps == null ? new ArrayList<>() : intSteps;
+        if (isSkip) {
+            this.skipSteps = intSteps == null ? new ArrayList<>() : intSteps;
+        }
     }
 
     public void addStepAfter(int newEndIndex) {
@@ -42,17 +44,17 @@ public class Move {
 
     @Override
     public String toString() {
-        StringBuilder result = new StringBuilder(String.valueOf(startIndex));
+        StringBuilder result = new StringBuilder(String.valueOf(startIndex+1));
 
         if (!isSkip) {
-            result.append("-").append(endIndex);
+            result.append("-").append(endIndex+1);
             return result.toString();
         }
         result.append("x");
         for (int skipStep : skipSteps) {
-            result.append(skipStep).append("x");
+            result.append(skipStep+1).append("x");
         }
-        result.append(endIndex);
+        result.append(endIndex+1);
         return result.toString();
     }
 

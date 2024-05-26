@@ -467,7 +467,6 @@ public class Board {
 
         baseStr+=pointsToIndexes(points);
         System.out.println(baseStr);
-
     }
 }
 
