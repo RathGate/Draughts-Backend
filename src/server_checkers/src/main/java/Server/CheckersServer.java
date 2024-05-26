@@ -1,6 +1,5 @@
-package com.example.checkers;
+package Server;
 
-import netscape.javascript.JSObject;
 import org.java_websocket.server.WebSocketServer;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -9,7 +8,6 @@ import org.json.JSONObject;
 import java.net.InetSocketAddress;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 

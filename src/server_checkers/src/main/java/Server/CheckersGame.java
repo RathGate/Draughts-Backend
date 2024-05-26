@@ -1,4 +1,4 @@
-package com.example.checkers;
+package Server;
 
 import org.java_websocket.WebSocket;
 import org.json.JSONObject;
