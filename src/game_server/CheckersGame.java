@@ -1,4 +1,4 @@
-package Server;
+package game_server;
 
 import org.java_websocket.WebSocket;
 import org.json.JSONObject;
