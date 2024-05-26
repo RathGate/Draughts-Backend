@@ -1,6 +1,5 @@
 // WebSocket connection URL
-const wsUrl = 'ws://localhost:3000';
-
+const wsUrl = 'ws://192.168.1.69:6969';
 
 const messagesDiv = document.getElementById('messages');
 const messageForm = document.getElementById('message-form');

@@ -4,9 +4,13 @@ import checkers.Player;
 import checkers.board.Board;
 import checkers.board.Color;
 import checkers.board.Piece;
+import com.google.gson.Gson;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Game {
@@ -22,7 +26,6 @@ public class Game {
     public Player playerWhite;
     public Player playerBlack;
     public boolean isWhiteTurn = true;
-    public boolean hasWhiteStarted = true;
     public int round = 1;
     public Result result = Result.None;
 
@@ -54,7 +57,8 @@ public class Game {
     }
     public boolean makeMove(int startIndex, int endIndex) {
         boolean switchTurn = true;
-
+        startIndex -= 1;
+        endIndex -= 1;
         if (!Rules.isValidMove(this, startIndex, endIndex)) {
             return false;
         }
@@ -118,4 +122,26 @@ public class Game {
         moves.add(move);
         lastSkipInTurn = move;
     }
+
+    public Color getCurrentPlayerColor() {
+        return isWhiteTurn ? Color.White : Color.Black;
+    }
+
+    public JSONObject toJsonObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("round", round);
+        jsonObject.put("board", this.getBoard().toState());
+        JSONArray jsonMoves = new JSONArray();
+        for (Move move : moves) {
+            jsonMoves.put(move.toString());
+        }
+        jsonObject.put("moves", jsonMoves);
+        jsonObject.put("current_turn", getCurrentPlayerColor().toString());
+        return jsonObject;
+    }
+    public String toJSONString() {
+        return this.toJsonObject().toString();
+    }
+
+
 }

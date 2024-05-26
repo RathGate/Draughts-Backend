@@ -78,27 +78,19 @@ public class CheckersServer extends WebSocketServer {
         System.out.println("Starting a new game between " + player1.getRemoteSocketAddress() + " and "
                 + player2.getRemoteSocketAddress());
 
-        Integer firstPlayerToMove = Math.random() < 0.5 ? 1 : 2;
-
-        JSONObject startMessageP1 = new JSONObject();
-        startMessageP1.put("type", "start");
-        startMessageP1.put("playerId", 1);
-        startMessageP1.put("color", "black");
-        startMessageP1.put("opponent", "white");
-        startMessageP1.put("firstMove", firstPlayerToMove);
-        player1.send(startMessageP1.toString());
-
-        JSONObject startMessageP2 = new JSONObject();
-        startMessageP2.put("type", "start");
-        startMessageP2.put("playerId", 2);
-        startMessageP2.put("color", "white");
-        startMessageP2.put("opponent", "black");
-        startMessageP2.put("firstMove", firstPlayerToMove);
-        player2.send(startMessageP2.toString());
-
         CheckersGame game = new CheckersGame(player1, player2);
         games.put(player1, game);
         games.put(player2, game);
+        game.game.print();
+
+        JSONObject startMessage = new JSONObject();
+        startMessage.put("game", game.game.toJSONString());
+        System.out.println(game.game.toJSONString());
+        startMessage.put("player_color", game.player1.getColor());
+        player1.send(startMessage.toString());
+
+        startMessage.put("player_color", game.player2.getColor());
+        player2.send(startMessage.toString());
     }
 
     public static void main(String[] args) {

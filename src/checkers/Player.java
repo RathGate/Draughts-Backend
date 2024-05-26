@@ -14,4 +14,7 @@ public class Player {
         this.username = username;
         this.color = color;
     }
+
+    public Color getColor() { return this.color; }
+
 }
