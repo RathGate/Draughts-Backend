@@ -7,6 +7,7 @@ import org.java_websocket.server.WebSocketServer;
 import org.json.JSONObject;
 
 import java.net.InetSocketAddress;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
@@ -20,6 +21,8 @@ public class CheckersServer extends WebSocketServer {
     private Queue<WebSocket> playerQueue = new ConcurrentLinkedQueue<>();
     private Map<WebSocket, CheckersGame> games = new HashMap<>();
 
+    private DbConn dbConn = new DbConn();
+
     public CheckersServer() {
         super(new InetSocketAddress(PORT));
     }
@@ -27,11 +30,14 @@ public class CheckersServer extends WebSocketServer {
     @Override
     public void onStart() {
         System.out.println("Server started successfully!");
+
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         System.out.println("New connection: " + conn.getRemoteSocketAddress());
+        // dbConn.insertIntoDatabase("matchmaking_log", "nom, enter_queue",
+        // "'" + conn.getRemoteSocketAddress().toString() + "', CURRENT_TIMESTAMP");
         playerQueue.offer(conn);
         matchPlayers();
     }
