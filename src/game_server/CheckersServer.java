@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import game_server.DbConn;
+
 public class CheckersServer extends WebSocketServer {
 
     private static final int PORT = 6969;

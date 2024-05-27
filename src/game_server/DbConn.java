@@ -1,3 +1,4 @@
+package game_server;
 
 import java.net.http.WebSocket;
 import java.sql.Connection;
@@ -9,38 +10,41 @@ import java.sql.SQLException;
 public class DbConn {
 
     private Connection connect() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/dbname";
-        String user = "username";
-        String password = "password";
+        String url = "jdbc:mysql://localhost:3306/checkers_db";
+        String user = "root";
+        String password = "devine0405";
         return DriverManager.getConnection(url, user, password);
     }
 
-    // public void onMessage(String message, WebSocket conn) {
-    // System.out.println("Message received: " + message);
-    // String response = fetchFromDatabase(message);
-    // try {
-    // conn.send(response);
-    // } catch (Exception e) {
-    // e.printStackTrace();
-    // }
-    // }
+    
 
-    private String fetchFromDatabase(String message) {
-        String result = "";
-        String query = "SELECT info FROM your_table WHERE condition = ?";
-
+    private String fetchFromDatabase(String nom_colones, String table) {
+        String sql = "SELECT " + nom_colones + " FROM " + table;
+        StringBuilder response = new StringBuilder();
         try (Connection conn = connect();
-                PreparedStatement pstmt = conn.prepareStatement(query)) {
-
-            pstmt.setString(1, message);
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()) {
-                result = rs.getString("info");
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                response.append(rs.getString(nom_colones)).append("\n");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
-        return result;
+        return response.toString();
+    }
+
+    private void insertIntoDatabase(String table, String nom_colones, String values) {
+        String sql = "INSERT INTO " + table + " (" + nom_colones + ") VALUES (" + values + ")";
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        DbConn dbConn = new DbConn();
+        dbConn.insertIntoDatabase("matchmaking_log", "nom", "'user1'");
+        System.out.println(dbConn.fetchFromDatabase("nom", "matchmaking_log"));
     }
 }
