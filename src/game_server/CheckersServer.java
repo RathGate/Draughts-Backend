@@ -1,5 +1,6 @@
 package game_server;
 
+import com.google.gson.Gson;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -83,14 +84,16 @@ public class CheckersServer extends WebSocketServer {
         games.put(player2, game);
         game.game.print();
 
-        JSONObject startMessage = new JSONObject();
-        startMessage.put("game", game.game.toJSONString());
-        System.out.println(game.game.toJSONString());
-        startMessage.put("player_color", game.player1.getColor());
-        player1.send(startMessage.toString());
+        for (NetworkPlayer p : game.players) {
+            JSONObject moveJson = new JSONObject();
+            moveJson.put("game", game.game.toJsonObject());
+            moveJson.put("player_color", p.getColor());
 
-        startMessage.put("player_color", game.player2.getColor());
-        player2.send(startMessage.toString());
+            if (game.game.getCurrentPlayerColor() == p.getColor()) {
+                moveJson.put("legal_moves", game.game.getBoard().getLegalMovesStr(p.getColor()));
+            }
+            p.socket.send(moveJson.toString());
+        }
     }
 
     public static void main(String[] args) {

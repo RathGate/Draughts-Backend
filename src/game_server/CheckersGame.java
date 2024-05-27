@@ -5,19 +5,23 @@ import checkers.logic.Game;
 import org.java_websocket.WebSocket;
 import org.json.JSONObject;
 
+import java.awt.image.AffineTransformOp;
+
 public class CheckersGame {
+    public NetworkPlayer[] players;
     public NetworkPlayer player1;
     public NetworkPlayer player2;
     public Game game;
 
+
     public CheckersGame(WebSocket player1, WebSocket player2) {
         this.player1 = new NetworkPlayer(Color.White, player1);
         this.player2 = new NetworkPlayer(Color.Black, player2);
+        this.players = new NetworkPlayer[]{this.player1, this.player2};
         this.game = new Game();
     }
 
     public void handleMove(WebSocket player, String move) {
-        JSONObject moveJson = new JSONObject();
         boolean isValid;
         try {
             String[] positions = move.split(" ");
@@ -26,17 +30,22 @@ public class CheckersGame {
             isValid = false;
         }
         if (!isValid) {
+            JSONObject moveJson = new JSONObject();
             moveJson.put("is_move_valid", false);
             player.send(moveJson.toString());
             return;
         }
-        moveJson.put("is_move_valid", true);
-        moveJson.put("game", game.toJSONString());
-        moveJson.put("current_player", player1.getColor());
-        player1.socket.send(moveJson.toString());
-        moveJson.put("current_player", player2.getColor());
-        player2.socket.send(moveJson.toString());
 
+        for (NetworkPlayer p : this.players) {
+            JSONObject moveJson = new JSONObject();
+            moveJson.put("is_move_valid", true);
+            moveJson.put("game", game.toJsonObject());
+            moveJson.put("player_color", p.getColor());
+            if (game.getCurrentPlayerColor() == p.getColor()) {
+                moveJson.put("legal_moves", game.getBoard().getLegalMovesStr(p.getColor()));
+            }
+            p.socket.send(moveJson.toString());
+        }
         game.print();
     }
 
