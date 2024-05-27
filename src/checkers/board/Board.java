@@ -314,6 +314,18 @@ public class Board {
         }
         return legalMoves;
     }
+    public List<String> getLegalMovesStr(Color color) {
+        List<Move> legalMoves = getLegalMoves(color);
+        List<String> result = new ArrayList<>();
+        for (Move move : legalMoves) {
+            if (move == null) {
+                result.add("");
+                continue;
+            }
+            result.add(move.toString());
+        }
+        return result;
+    }
 
     public String toState() {
         StringBuilder state = new StringBuilder();
