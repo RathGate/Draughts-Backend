@@ -40,8 +40,8 @@ public class DbConn {
         String sql = "SELECT " + nom_colones + " FROM " + table;
         StringBuilder response = new StringBuilder();
         try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 response.append(rs.getString(nom_colones)).append("\n");
             }
@@ -67,5 +67,4 @@ public class DbConn {
         dbConn.insertIntoDatabase("matchmaking_log", "nom", "'usertest'");
         System.out.println(dbConn.fetchFromDatabase("nom", "matchmaking_log"));
     }
-
 }
