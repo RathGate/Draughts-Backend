@@ -17,8 +17,9 @@ import com.google.gson.JsonParseException;
 public class DbConn {
 
     private JsonObject loadJson() throws IOException {
+        // load the database credentials from db_credentials.json
         Gson gson = new Gson();
-        Path path = Paths.get("../db_credentials.json"); // Adjust path as necessary
+        Path path = Paths.get("../db_credentials.json");
         try {
             String content = new String(Files.readAllBytes(path));
             return gson.fromJson(content, JsonObject.class);
@@ -28,6 +29,8 @@ public class DbConn {
     }
 
     private Connection connect() throws SQLException, IOException {
+        // connect to the database using the credentials laoded with the method above
+        // and return the connection object
         JsonObject jsonObject = loadJson();
         String url = jsonObject.get("url").getAsString();
         String user = jsonObject.get("user").getAsString();
@@ -36,14 +39,16 @@ public class DbConn {
         return DriverManager.getConnection(url, user, password);
     }
 
-    public String fetchFromDatabase(String nom_colones, String table) {
-        String sql = "SELECT " + nom_colones + " FROM " + table;
+    public String fetchFromDatabase(String column_names, String table) {
+        // fetch the data from the database and return it as a string
+        // the data is fetched from the specified column and table
+        String sql = "SELECT " + column_names + " FROM " + table;
         StringBuilder response = new StringBuilder();
         try (Connection conn = connect();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                response.append(rs.getString(nom_colones)).append("\n");
+                response.append(rs.getString(column_names)).append("\n");
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -53,8 +58,10 @@ public class DbConn {
         return response.toString();
     }
 
-    public void insertIntoDatabase(String table, String nom_colones, String values) {
-        String sql = "INSERT INTO " + table + " (" + nom_colones + ") VALUES (" + values + ")";
+    public void insertIntoDatabase(String table, String column_names, String values) {
+        // insert the data into the database
+        // the data is inserted into the specified table and columns
+        String sql = "INSERT INTO " + table + " (" + column_names + ") VALUES (" + values + ")";
         try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.executeUpdate();
         } catch (SQLException | IOException e) {

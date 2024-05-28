@@ -18,23 +18,25 @@ import game_server.DbConn;
 public class CheckersServer extends WebSocketServer {
 
     private static final int PORT = 6969;
+
     private Queue<WebSocket> playerQueue = new ConcurrentLinkedQueue<>();
     private Map<WebSocket, CheckersGame> games = new HashMap<>();
 
-    private DbConn dbConn = new DbConn();
+    // private DbConn dbConn = new DbConn();
 
     public CheckersServer() {
+        // initialize a websocket server with the port
         super(new InetSocketAddress(PORT));
     }
 
     @Override
     public void onStart() {
         System.out.println("Server started successfully!");
-
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        // when a new connection is opened, add it to the queue
         System.out.println("New connection: " + conn.getRemoteSocketAddress());
         // dbConn.insertIntoDatabase("matchmaking_log", "nom, enter_queue",
         // "'" + conn.getRemoteSocketAddress().toString() + "', CURRENT_TIMESTAMP");
@@ -44,6 +46,8 @@ public class CheckersServer extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+        // when a player connection is closed, remove it from the queue,
+        // close the game if it is in progress and notify the opponent
         System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
         playerQueue.remove(conn);
         CheckersGame game = games.remove(conn);
@@ -57,6 +61,8 @@ public class CheckersServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+        // when a message is received, handle the move
+        // if the game is over, remove both players from the game
         CheckersGame game = games.get(conn);
         if (game != null) {
             game.handleMove(conn, message);
@@ -69,10 +75,12 @@ public class CheckersServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
+        // log the error
         ex.printStackTrace();
     }
 
     private void matchPlayers() {
+        // match players in the queue, two at a time
         while (playerQueue.size() >= 2) {
             WebSocket player1 = playerQueue.poll();
             WebSocket player2 = playerQueue.poll();
@@ -84,19 +92,23 @@ public class CheckersServer extends WebSocketServer {
     }
 
     private void startGame(WebSocket player1, WebSocket player2) {
+        // start a new game between two players
         System.out.println("Starting a new game between " + player1.getRemoteSocketAddress() + " and "
                 + player2.getRemoteSocketAddress());
 
+        // initialize a new game
         CheckersGame game = new CheckersGame(player1, player2);
         games.put(player1, game);
         games.put(player2, game);
         game.game.print();
 
+        // send the initial game state to both players
         for (NetworkPlayer p : game.players) {
             JSONObject moveJson = new JSONObject();
             moveJson.put("game", game.game.toJsonObject());
             moveJson.put("player_color", p.getColor());
 
+            // if it is the player's turn, send the legal moves
             if (game.game.getCurrentPlayerColor() == p.getColor()) {
                 moveJson.put("legal_moves", game.game.getBoard().getLegalMovesStr(p.getColor()));
             }
@@ -105,6 +117,7 @@ public class CheckersServer extends WebSocketServer {
     }
 
     public static void main(String[] args) {
+        // start the checkers server
         CheckersServer server = new CheckersServer();
         server.start();
         System.out.println("Checkers server started on port: " + PORT);
