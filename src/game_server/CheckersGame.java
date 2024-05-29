@@ -15,15 +15,16 @@ public class CheckersGame {
     public NetworkPlayer player2;
     public Game game;
 
-
     public CheckersGame(WebSocket player1, WebSocket player2) {
+        // initialize the game with two players
         this.player1 = new NetworkPlayer(Color.White, player1);
         this.player2 = new NetworkPlayer(Color.Black, player2);
-        this.players = new NetworkPlayer[]{this.player1, this.player2};
+        this.players = new NetworkPlayer[] { this.player1, this.player2 };
         this.game = new Game();
     }
 
     public void handleMove(WebSocket player, String move) {
+        // verify the move, if not valid, send a message to the player
         boolean isValid;
         try {
             String[] positions = move.split(" ");
@@ -38,6 +39,7 @@ public class CheckersGame {
             return;
         }
 
+        // send the updated game state to both players
         for (NetworkPlayer p : this.players) {
             JSONObject moveJson = new JSONObject();
 //            moveJson.put("is_move_valid", true);
