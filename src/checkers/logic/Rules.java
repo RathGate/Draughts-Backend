@@ -7,11 +7,12 @@ import java.awt.*;
 
 public class Rules {
 
-
     public static boolean isValidMove(Game game, int startIndex, int endIndex) {
-        return isValidMove(game.getBoard(), game.isWhiteTurn, startIndex, endIndex, game.lastSkipIndex);
+        return isValidMove(game.getBoard(), game.isWhiteTurn, startIndex, endIndex, game.lastSkipInTurn);
     }
-    public static boolean isValidMove(Board board, boolean isWhiteTurn, int startIndex, int endIndex, int skipIndex) {
+    public static boolean isValidMove(Board board, boolean isWhiteTurn, int startIndex, int endIndex, Move lastSkipInTurn) {
+
+        int lastSkipIndex = lastSkipInTurn != null ? lastSkipInTurn.endIndex : -1;
         // Board check
         if (board == null) {
             System.out.println("Board is not valid");
@@ -21,7 +22,7 @@ public class Rules {
             System.out.println("Invalid indexes");
             return false;
         // Additional indexes check if not first move of the player's round
-        } else if (Board.isValidIndex(skipIndex) && skipIndex != startIndex) {
+        } else if (Board.isValidIndex(lastSkipIndex) && lastSkipIndex != startIndex) {
             System.out.println("Invalid movement after skip");
             return false;
         }

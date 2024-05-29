@@ -82,16 +82,15 @@ public class CheckersServer extends WebSocketServer {
         CheckersGame game = new CheckersGame(player1, player2);
         games.put(player1, game);
         games.put(player2, game);
-        game.game.print();
 
         for (NetworkPlayer p : game.players) {
             JSONObject moveJson = new JSONObject();
-            moveJson.put("game", game.game.toJsonObject());
-            moveJson.put("player_color", p.getColor());
-
-            if (game.game.getCurrentPlayerColor() == p.getColor()) {
-                moveJson.put("legal_moves", game.game.getBoard().getLegalMovesStr(p.getColor()));
-            }
+//            moveJson.put("is_move_valid", true);
+            moveJson.put("game", game.game.toJsonObject(p.getColor()));
+//            moveJson.put("player_color", p.getColor());
+//            if (game.getCurrentPlayerColor() == p.getColor()) {
+//                moveJson.put("legal_moves", game.getBoard().getLegalMovesStr(p.getColor()));
+//            }
             p.socket.send(moveJson.toString());
         }
     }

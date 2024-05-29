@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 public class Board {
     public Square[] squares = new Square[32];
-
     public Board() {
         emptyBoard();
 
@@ -175,6 +174,18 @@ public class Board {
         }
         return indexes;
     }
+
+    public List<Point> findPieces() {
+        List<Point> points = new ArrayList<>();
+        for (int i = 0; i < 32; i++) {
+            Piece piece = getPieceAt(i);
+            if (piece != null) {
+                points.add(toPoint(i));
+            }
+        }
+        return points;
+    }
+
     public List<Point> findPieces(Color color) {
         List<Point> points = new ArrayList<>();
 
@@ -331,6 +342,8 @@ public class Board {
         StringBuilder state = new StringBuilder();
         List<String> whites = new ArrayList<>();
         List<String> blacks = new ArrayList<>();
+
+
         for (int i = 0; i < 32; i++) {
             Piece piece = getPieceAt(i);
             if (piece == null) { continue; }
@@ -343,11 +356,10 @@ public class Board {
             blacks.add(temp+(i+1));
         }
 
-        if (whites.size() != 0) { state.append("W").append(String.join(",",whites)); }
-        if (blacks.size() != 0) {
-            if (whites.size() != 0) { state.append(":"); }
-            state.append("B").append(String.join(",",blacks));
-        }
+        state.append("W").append(String.join(",",whites));
+        state.append(":");
+        state.append("B").append(String.join(",",blacks));
+
         return state.toString();
     }
 
@@ -439,6 +451,7 @@ public class Board {
     }
 
     public List<Move> getCompleteSkips(int startIndex) {
+
         Board saved_board = this.copy();
         List<Move> result_skips = new ArrayList<>();
 
@@ -449,7 +462,7 @@ public class Board {
             Board temp_board = saved_board.copy();
             int end_index = toIndex(skip);
             temp_board.movePiece(startIndex, end_index);
-            Move temp = new Move(startIndex, end_index,true);
+            Move temp = new Move(startIndex, end_index,true, null, true);
             List <Move> movesFromIndex = temp_board.getCompleteSkips(end_index);
             if (movesFromIndex.isEmpty()) {
                     result_skips.add(temp);

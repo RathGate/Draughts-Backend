@@ -2,6 +2,8 @@ package game_server;
 
 import checkers.board.Color;
 import checkers.logic.Game;
+import checkers.logic.Move;
+import com.google.gson.Gson;
 import org.java_websocket.WebSocket;
 import org.json.JSONObject;
 
@@ -38,15 +40,14 @@ public class CheckersGame {
 
         for (NetworkPlayer p : this.players) {
             JSONObject moveJson = new JSONObject();
-            moveJson.put("is_move_valid", true);
-            moveJson.put("game", game.toJsonObject());
-            moveJson.put("player_color", p.getColor());
-            if (game.getCurrentPlayerColor() == p.getColor()) {
-                moveJson.put("legal_moves", game.getBoard().getLegalMovesStr(p.getColor()));
-            }
+//            moveJson.put("is_move_valid", true);
+            moveJson.put("game", game.toJsonObject(p.getColor()));
+//            moveJson.put("player_color", p.getColor());
+//            if (game.getCurrentPlayerColor() == p.getColor()) {
+//                moveJson.put("legal_moves", game.getBoard().getLegalMovesStr(p.getColor()));
+//            }
             p.socket.send(moveJson.toString());
         }
-        game.print();
     }
 
     public boolean isGameOver() {

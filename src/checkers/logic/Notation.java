@@ -48,7 +48,7 @@ public class Notation {
             }
             skipSteps.add(temp);
         }
-        return new Move(start, end, isSkip, skipSteps);
+        return new Move(start, end, isSkip, skipSteps, false);
     }
     public static String sanitizeString(String str) {
         return str.replaceAll("\\{[^{}]*\\}", "").replaceAll("\\s+|[?!]", " ").strip();
