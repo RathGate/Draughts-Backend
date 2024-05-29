@@ -8,6 +8,9 @@ import org.java_websocket.WebSocket;
 import org.json.JSONObject;
 
 import java.awt.image.AffineTransformOp;
+import java.util.Objects;
+
+import static checkers.logic.Notation.toPDN;
 
 public class CheckersGame {
     public NetworkPlayer[] players;
@@ -26,28 +29,27 @@ public class CheckersGame {
     public void handleMove(WebSocket player, String move) {
         // verify the move, if not valid, send a message to the player
         boolean isValid;
-        try {
+//        try {
             String[] positions = move.split(" ");
             isValid = game.makeMove(Integer.parseInt(positions[0]), Integer.parseInt(positions[1]));
-        } catch (Exception e) {
-            isValid = false;
-        }
+//        } catch (Exception e) {
+//            isValid = false;
+//        }
         if (!isValid) {
-            JSONObject moveJson = new JSONObject();
-            moveJson.put("is_move_valid", false);
-            player.send(moveJson.toString());
             return;
         }
 
+        String pdn = game.isGameOver ? toPDN(game) : "";
+        System.out.println(pdn + " "+game.isGameOver);
         // send the updated game state to both players
         for (NetworkPlayer p : this.players) {
             JSONObject moveJson = new JSONObject();
-//            moveJson.put("is_move_valid", true);
             moveJson.put("game", game.toJsonObject(p.getColor()));
-//            moveJson.put("player_color", p.getColor());
-//            if (game.getCurrentPlayerColor() == p.getColor()) {
-//                moveJson.put("legal_moves", game.getBoard().getLegalMovesStr(p.getColor()));
-//            }
+            String username = Objects.equals(getPlayer(getOpponent(p.socket)).username, "") ? "Anonymous" : getPlayer(getOpponent(p.socket)).username;
+            moveJson.put("opponent_username", username);
+            if (!pdn.equals("")) {
+                moveJson.put("pdn", "ris");
+            }
             p.socket.send(moveJson.toString());
         }
     }
@@ -68,4 +70,17 @@ public class CheckersGame {
     public WebSocket getOpponent(WebSocket player) {
         return player == player1.socket ? player2.socket : player1.socket;
     }
+    public NetworkPlayer getPlayer(WebSocket player) {
+        for (NetworkPlayer p : players) {
+            if (p.socket == player) { return p; }
+        }
+        return null;
+    }
+    public NetworkPlayer getPlayer(Color color) {
+        for (NetworkPlayer p : players) {
+            if (p.getColor() == color) { return p; }
+        }
+        return null;
+    }
+
 }

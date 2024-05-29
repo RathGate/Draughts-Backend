@@ -16,9 +16,9 @@ public class Board {
     public Board() {
         emptyBoard();
 
-        for (int i = 0; i < 8; i++) {
-            squares[i].piece = new Piece(Color.Black);
-            squares[31-i].piece = new Piece(Color.White);
+        for (int i = 0; i < 4; i++) {
+            squares[8+i].piece = new Piece(Color.Black, Piece.PieceType.King);
+            squares[23-i].piece = new Piece(Color.White, Piece.PieceType.King);
         }
     }
 

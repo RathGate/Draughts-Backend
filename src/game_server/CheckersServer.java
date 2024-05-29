@@ -1,6 +1,7 @@
 package game_server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonParser;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -10,10 +11,12 @@ import java.net.InetSocketAddress;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import game_server.DbConn;
+import org.json.JSONPointer;
 
 public class CheckersServer extends WebSocketServer {
 
@@ -63,9 +66,20 @@ public class CheckersServer extends WebSocketServer {
     public void onMessage(WebSocket conn, String message) {
         // when a message is received, handle the move
         // if the game is over, remove both players from the game
+        JSONObject obj = new JSONObject(message);
         CheckersGame game = games.get(conn);
         if (game != null) {
-            game.handleMove(conn, message);
+            NetworkPlayer p = game.getPlayer(conn);
+//            if (p.id == -1 || Objects.equals(p.username, "")) {
+//                try {
+                    p.id = obj.getInt("id");
+                    p.username = obj.getString("username");
+//                } catch (Exception ignored) {
+//
+//                };
+//            }
+
+            game.handleMove(conn, obj.getString("move"));
             if (game.isGameOver()) {
                 games.remove(game.getPlayer1());
                 games.remove(game.getPlayer2());
@@ -105,6 +119,8 @@ public class CheckersServer extends WebSocketServer {
         for (NetworkPlayer p : game.players) {
             JSONObject moveJson = new JSONObject();
             moveJson.put("game", game.game.toJsonObject(p.getColor()));
+            String username = Objects.equals(game.getPlayer(game.getOpponent(p.socket)).username, "") ? "Anonymous" : game.getPlayer(game.getOpponent(p.socket)).username;
+            moveJson.put("opponent_username", username);
             p.socket.send(moveJson.toString());
         }
     }

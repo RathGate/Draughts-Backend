@@ -92,8 +92,6 @@ public class Game {
         boolean isSkip = midIndex > 0;
 
         // Check if king moves in a row
-        System.out.println("Is king "+movingPiece.isKing());
-        System.out.println("Is Skip "+isSkip);
         if (movingPiece.isKing() && !isSkip) {
             consecutiveKingMoves++;
         } else {
@@ -169,7 +167,6 @@ public class Game {
     }
 
     public JSONObject toJsonObject() {
-        System.out.println("Consecutive kings : "+consecutiveKingMoves);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("fen", this.FEN);
         jsonObject.put("board", this.toState());

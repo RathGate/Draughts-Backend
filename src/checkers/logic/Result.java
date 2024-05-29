@@ -35,4 +35,21 @@ public class Result {
     public void setScoreComment(ScoreComment newScoreComment) {
         this.scoreComment = newScoreComment;
     }
+
+    public String getScoreStr() {
+        switch (score) {
+            case White -> {
+                return "1-0";
+            }
+            case Black -> {
+                return "0-1";
+            }
+            case Tie -> {
+                return "1/2-1/2";
+            }
+            default -> {
+                return "";
+            }
+        }
+    }
 }
