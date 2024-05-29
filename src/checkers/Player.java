@@ -17,4 +17,8 @@ public class Player {
 
     public Color getColor() { return this.color; }
 
+    public void setColor(Color newColor) {
+        this.color = newColor;
+    }
+
 }

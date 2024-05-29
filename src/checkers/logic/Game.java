@@ -183,7 +183,7 @@ public class Game {
         }
 
         jsonObject.put("current_turn", getCurrentPlayerColor().toString());
-
+        jsonObject.put("is_game_over", this.isGameOver);
         if (result == null) {
             return jsonObject;
         }

@@ -4,11 +4,7 @@ import java.net.http.WebSocket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.io.IOException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -58,20 +54,25 @@ public class DbConn {
         return response.toString();
     }
 
-    public void insertIntoDatabase(String table, String column_names, String values) {
+    public int insertIntoDatabase(String table, String column_names, String values) {
         // insert the data into the database
         // the data is inserted into the specified table and columns
         String sql = "INSERT INTO " + table + " (" + column_names + ") VALUES (" + values + ")";
-        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = connect(); PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         } catch (SQLException | IOException e) {
             System.out.println(e.getMessage());
         }
+        return -1;
     }
 
     public static void test(String[] args) {
         DbConn dbConn = new DbConn();
-        dbConn.insertIntoDatabase("matchmaking_log", "nom", "'usertest'");
-        System.out.println(dbConn.fetchFromDatabase("nom", "matchmaking_log"));
+        dbConn.insertIntoDatabase("matchmaking_logs", "nom", "'usertest'");
+        System.out.println(dbConn.fetchFromDatabase("nom", "matchmaking_logs"));
     }
 }

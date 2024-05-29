@@ -2,15 +2,10 @@ package game_server;
 
 import checkers.board.Color;
 import checkers.logic.Game;
-import checkers.logic.Move;
-import com.google.gson.Gson;
 import org.java_websocket.WebSocket;
 import org.json.JSONObject;
 
-import java.awt.image.AffineTransformOp;
 import java.util.Objects;
-
-import static checkers.logic.Notation.toPDN;
 
 public class CheckersGame {
     public NetworkPlayer[] players;
@@ -18,10 +13,12 @@ public class CheckersGame {
     public NetworkPlayer player2;
     public Game game;
 
-    public CheckersGame(WebSocket player1, WebSocket player2) {
+    public CheckersGame(NetworkPlayer player1, NetworkPlayer player2) {
         // initialize the game with two players
-        this.player1 = new NetworkPlayer(Color.White, player1);
-        this.player2 = new NetworkPlayer(Color.Black, player2);
+        this.player1 = player1;
+        player1.setColor(Color.White);
+        this.player2 = player2;
+        player2.setColor(Color.Black);
         this.players = new NetworkPlayer[] { this.player1, this.player2 };
         this.game = new Game();
     }
@@ -29,27 +26,22 @@ public class CheckersGame {
     public void handleMove(WebSocket player, String move) {
         // verify the move, if not valid, send a message to the player
         boolean isValid;
-//        try {
+        try {
             String[] positions = move.split(" ");
             isValid = game.makeMove(Integer.parseInt(positions[0]), Integer.parseInt(positions[1]));
-//        } catch (Exception e) {
-//            isValid = false;
-//        }
+        } catch (Exception e) {
+            isValid = false;
+        }
         if (!isValid) {
             return;
         }
 
-        String pdn = game.isGameOver ? toPDN(game) : "";
-        System.out.println(pdn + " "+game.isGameOver);
         // send the updated game state to both players
         for (NetworkPlayer p : this.players) {
             JSONObject moveJson = new JSONObject();
             moveJson.put("game", game.toJsonObject(p.getColor()));
             String username = Objects.equals(getPlayer(getOpponent(p.socket)).username, "") ? "Anonymous" : getPlayer(getOpponent(p.socket)).username;
             moveJson.put("opponent_username", username);
-            if (!pdn.equals("")) {
-                moveJson.put("pdn", "ris");
-            }
             p.socket.send(moveJson.toString());
         }
     }
