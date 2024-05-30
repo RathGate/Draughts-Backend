@@ -71,10 +71,6 @@ public class Move {
         return new Move(this.startIndex, this.endIndex, this.isSkip, this.skipSteps, this.isAmbiguous);
     }
 
-    public void testPrint() {
-        System.out.println("Start: "+this.startIndex + " | End: "+this.endIndex+" | Middle: "+skipSteps +" | IsAmbiguous: "+this.isAmbiguous);
-    }
-
     public List<Integer> getSteps(boolean increment) {
         int incr = increment ? 1 : 0;
         List<Integer> result = new ArrayList<>();
