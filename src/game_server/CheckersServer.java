@@ -48,14 +48,28 @@ public class CheckersServer extends WebSocketServer {
         // when a player connection is closed, remove it from the queue,
         // close the game if it is in progress and notify the opponent
         System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
+        waitingQueue.remove(conn);
         playerQueue.remove(conn);
         players.remove(conn);
-        CheckersGame game = games.remove(conn);
+        CheckersGame game = games.get(conn);
         if (game != null) {
+            game.game.setForfeit(game.getPlayer(conn).getColor());
             WebSocket opponent = game.getOpponent(conn);
-            if (opponent != null) {
-                opponent.send("Opponent disconnected, game over.");
-            }
+            try {
+                if (opponent != null) {
+                    NetworkPlayer p = game.getPlayer(opponent);
+                    JSONObject moveJson = new JSONObject();
+                    moveJson.put("game", game.game.toJsonObject(p.getColor()));
+                    String username = Objects.equals(game.getPlayer(game.getOpponent(p.socket)).username, "") ? "Anonymous" : game.getPlayer(game.getOpponent(p.socket)).username;
+                    moveJson.put("opponent_username", username);
+                    opponent.send(moveJson.toString());
+                }
+            } catch (Exception ignored) {};
+            games.remove(game.getPlayer1());
+            games.remove(game.getPlayer2());
+            players.remove(game.getPlayer1());
+            players.remove(game.getPlayer2());
+            saveGame(game);
         }
     }
 

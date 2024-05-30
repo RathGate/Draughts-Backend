@@ -263,4 +263,10 @@ public class Game {
         return false;
     }
 
+    public void setForfeit(Color player) {
+        this.isGameOver = true;
+        Result.Score score = player == Color.Black ? Result.Score.White : Result.Score.Black;
+        this.result = new Result(score, Result.ScoreComment.FORFEIT);
+    }
+
 }
