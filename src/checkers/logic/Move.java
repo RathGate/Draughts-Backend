@@ -5,6 +5,8 @@ import checkers.board.Board;
 import java.util.ArrayList;
 import java.util.List;
 
+import static checkers.logic.Rules.isValidIndex;
+
 public class Move {
     public boolean isSkip = false;
     public int startIndex;
@@ -30,14 +32,14 @@ public class Move {
     }
 
     public void addStepAfter(int newEndIndex) {
-        if (!Board.isValidIndex(newEndIndex) || !this.isSkip) {
+        if (!isValidIndex(newEndIndex) || !this.isSkip) {
             return;
         }
         skipSteps.add(this.endIndex);
         this.endIndex = newEndIndex;
     }
     public void addStepBefore(int newStartIndex) {
-        if (!Board.isValidIndex(newStartIndex) || !this.isSkip) {
+        if (!isValidIndex(newStartIndex) || !this.isSkip) {
             return;
         }
         skipSteps.add(0,this.startIndex);

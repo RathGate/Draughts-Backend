@@ -10,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Notation {
-    public String regexBlackFirst = "";
     public static String moveRegex = "(?:\\d{1,2}-\\d{1,2}|\\d{1,2}x\\d{1,2}(?:x\\d{1,2}){0,9})";
 
     public static Move toMove(String str) {

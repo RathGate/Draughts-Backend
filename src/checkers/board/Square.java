@@ -15,12 +15,6 @@ public class Square {
         return piece != null ? piece.toString() : "  ";
     }
 
-    public String toState() {
-        if (piece != null) {
-            return piece.toString();
-        }
-        return "--";
-    }
 
     public Square(Square square) {
         this.piece = square.piece == null ? null : new Piece(square.piece.color, square.piece.pieceType);

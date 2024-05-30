@@ -4,13 +4,15 @@ import checkers.Player;
 import checkers.board.Board;
 import checkers.board.Color;
 import checkers.board.Piece;
-import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static checkers.logic.Rules.isKingToBePromoted;
+import static checkers.logic.Rules.toIndex;
 
 public class Game {
     // Starting position in PDN (FEN)
@@ -68,7 +70,7 @@ public class Game {
         if (startPoint == null || endPoint == null) {
             return false;
         }
-        return makeMove(Board.toIndex(startPoint), Board.toIndex(endPoint));
+        return makeMove(toIndex(startPoint), toIndex(endPoint));
     }
     public boolean makeMove(int startIndex, int endIndex) {
         if (isGameOver) {
@@ -86,9 +88,9 @@ public class Game {
 
         Piece movingPiece = board.getPieceAt(startIndex);
         int midIndex = Board.getMiddleIndex(startIndex, endIndex);
-        board.setPiece(endIndex, movingPiece);
-        board.setPiece(midIndex, null);
-        board.setPiece(startIndex, null);
+        board.setPieceAt(endIndex, movingPiece);
+        board.setPieceAt(midIndex, null);
+        board.setPieceAt(startIndex, null);
         boolean isSkip = midIndex > 0;
 
         // Check if king moves in a row
@@ -99,8 +101,8 @@ public class Game {
         }
 
         // Crown king
-        if (board.checkKingPromotion(endIndex, movingPiece)) {
-            board.setPiece(endIndex, movingPiece.color, Piece.PieceType.King);
+        if (isKingToBePromoted(endIndex, movingPiece)) {
+            board.setPieceAt(endIndex, movingPiece.color, Piece.PieceType.King);
         }
 
         // Record move;
