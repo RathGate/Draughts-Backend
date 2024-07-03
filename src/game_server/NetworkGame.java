@@ -7,13 +7,13 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-public class CheckersGame {
+public class NetworkGame {
     public NetworkPlayer[] players;
     public NetworkPlayer player1;
     public NetworkPlayer player2;
     public Game game;
 
-    public CheckersGame(NetworkPlayer player1, NetworkPlayer player2) {
+    public NetworkGame(NetworkPlayer player1, NetworkPlayer player2) {
         // initialize the game with two players
         this.player1 = player1;
         player1.setColor(Color.White);
@@ -46,10 +46,6 @@ public class CheckersGame {
         }
     }
 
-    public boolean isGameOver() {
-        // game over conditions
-        return false;
-    }
 
     public WebSocket getPlayer1() {
         return player1.socket;

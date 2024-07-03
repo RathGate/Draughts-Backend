@@ -13,16 +13,16 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class CheckersServer extends WebSocketServer {
+public class GameServer extends WebSocketServer {
     private static final int PORT = 6969;
 
     private Queue<WebSocket> waitingQueue = new ConcurrentLinkedQueue<>();
     private Queue<WebSocket> playerQueue = new ConcurrentLinkedQueue<>();
     private Map<WebSocket, NetworkPlayer> players = new HashMap<>();
-    private Map<WebSocket, CheckersGame> games = new HashMap<>();
+    private Map<WebSocket, NetworkGame> games = new HashMap<>();
     private DbConn dbConn = new DbConn();
 
-    public CheckersServer() {
+    public GameServer() {
         // initialize a websocket server with the port
         super(new InetSocketAddress(PORT));
     }
@@ -51,7 +51,7 @@ public class CheckersServer extends WebSocketServer {
         waitingQueue.remove(conn);
         playerQueue.remove(conn);
         players.remove(conn);
-        CheckersGame game = games.get(conn);
+        NetworkGame game = games.get(conn);
         if (game != null) {
             game.game.setForfeit(game.getPlayer(conn).getColor());
             WebSocket opponent = game.getOpponent(conn);
@@ -79,7 +79,7 @@ public class CheckersServer extends WebSocketServer {
         // when a message is received, handle the move
         // if the game is over, remove both players from the game
         JSONObject obj = new JSONObject(message);
-        CheckersGame game = games.get(conn);
+        NetworkGame game = games.get(conn);
 
         if (game == null) {
             NetworkPlayer player = players.get(conn);
@@ -140,7 +140,7 @@ public class CheckersServer extends WebSocketServer {
         System.out.println(player2);
 
         // initialize a new game
-        CheckersGame game = new CheckersGame(players.get(player1), players.get(player2));
+        NetworkGame game = new NetworkGame(players.get(player1), players.get(player2));
         games.put(player1, game);
         games.put(player2, game);
 
@@ -160,12 +160,12 @@ public class CheckersServer extends WebSocketServer {
 
     public static void main(String[] args) {
         // start the checkers server
-        CheckersServer server = new CheckersServer();
+        GameServer server = new GameServer();
         server.start();
         System.out.println("Checkers server started on port: " + PORT);
     }
 
-    public boolean saveGame(CheckersGame game) {
+    public boolean saveGame(NetworkGame game) {
         System.out.printf("\"%s\", \"%s\", %d, %d%n", game.game.FEN, game.game.getMovesStr(), game.game.round, game.game.result.getScore().ordinal());
         int id = dbConn.insertIntoDatabase("games", "fen, history, rounds, result_id",
                 String.format("\"%s\", \"%s\", %d, %d", game.game.FEN, game.game.getMovesStr(), game.game.round, game.game.result.getScore().ordinal()));
